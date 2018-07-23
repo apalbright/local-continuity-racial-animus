@@ -1,0 +1,23 @@
+Bibliography
+Introduction of Television to the United States Media Market, 1946-1960
+
+This bibliography includes published and unpublished works that are related 
+to ICPSR study 22720. It includes works that are based on primary
+or secondary analysis of the data, or which describe or critique those
+data or the collection methodology. 
+
+If you publish a work or know of other works that are based on these data,
+please send the complete citation and name of the ICPSR study used to:
+icpsr-biblio-notify@umich.edu 
+
+
+1. Cavanagh, Patrick; Lang, Corey; Li, Xinran; Miao, Haoran; Ryder, John
+David , "Searching for the determinants of climate change interest."
+Geography Journal. 2014, (Article ID 503295),. DOI: 10.1155/2014/503295
+
+2. Gentzkow, Matthew, "Television and voter turnout." Quarterly Journal of
+Economics. Aug 2006, CXXI, (3),.
+
+3. Gentzkow, Matthew; Shapiro, Jesse, "Preschool television viewing and
+adolescent test scores: Historical evidence from the Coleman Study."
+Quarterly Journal of Economics. Feb 2008, CXXIII, (1),.

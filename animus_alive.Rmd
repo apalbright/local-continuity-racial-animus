@@ -1,0 +1,272 @@
+---
+title: "Testing for Local Continuity in Racial Animus"
+author: Alex Albright
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_notebook
+---
+
+# Overview
+
+This work was a potential project idea that I entertained for my final ECON 2325 (Comparative Historical Economic Development) paper. I wanted to use datasets that were new to me and think about the evolution of attitudes in American society. One paper that had struck me during the class was "Persecution Perpetuated" by Voightlander + Voth (2012) on anti-semitism in Germany. They showed local continuity in Anti-semitic beliefs over 600 years within fine levels of geography. (Publishable due to micro-level geography and hundreds of years -- the span of time and level of geographic detail made it interesting.) Basic idea: local historical sentiment predicts local modern sentiment to an impressive degree.
+
+I wanted to do a similar thing for racial attitudes in the US. Do historical measures of racial animus predict modern measures of racial animus? We'd expect yes and it wouldn't be too surprising if we found positive evidence. As my professor said, this wouldn't move peoples' priors (and so that's why I didn't expand on this project beyond the work in this notebook). But, even though this didn't evolve into a final project, let's explore some historical data and modern data on racial "animus."
+
+I use historical geographic variation in KKK locations (1915-1940) to see if that predicts racially charged google searches in 2004-2007. 
+
+# Data
+
+Historical (explanatory):
+
+- KKK data (long/lat) is from VCU "Mapping the Second Ku Klux Klan, 1919-1940" Project. Available for download [here.](http://scholarscompass.vcu.edu/hist_data/1/) More [here](https://news.vcu.edu/article/Digital_map_shows_spread_of_KKK_across_United_States_like_a_contagion)
+Caveats: (1) No data on number of members, just data on locations. (2) Not necessarily a full dataset. Don't know location of all klaverns.
+
+Modern (dependant):
+
+- Google search data on racially charged search rates for DMA areas (2004-2007) is from Seth Stephens-Davidowitz. Available on his website [here.](http://sethsd.com/research/) (nice because doesn't suffer from reporting issues)
+
+# Plot google search data
+
+The hard part here is that I am mapping rates by DMA rather than by state, which would be simpler and there would be ample examples of doing that online. I try out code found [here](https://stackoverflow.com/questions/35493585/r-import-html-json-map-file-to-use-for-heatmap). Note: json files found [here.](https://gist.github.com/simzou/6459889#file-nielsentopo-json)
+
+Some of code chunk below is via the StackOverflow link. It was altered slightly to include new merged data on racial animus.
+
+```{r, fig.height=4, fig.width=6, message=FALSE, warning=FALSE}
+library(sp)
+library(rgdal)
+library(maptools)
+library(rgeos)
+library(ggplot2)
+library(ggalt)
+library(ggthemes)
+library(jsonlite)
+library(purrr)
+library(viridis)
+library(scales)
+
+neil <- readOGR("geo/nielsentopo.json", "nielsen_dma", stringsAsFactors=FALSE, 
+                verbose=FALSE)
+ne<-neil
+# there are some techincal problems with the polygon that D3 glosses over
+neil <- SpatialPolygonsDataFrame(gBuffer(neil, byid=TRUE, width=0),
+                                  data=neil@data)
+neil_map <- fortify(neil, region="id")
+
+tv <- fromJSON("geo/tv.json", flatten=TRUE)
+tv_df <- map_df(tv, as.data.frame, stringsAsFactors=FALSE, .id="id")
+colnames(tv_df) <- c("id", "rank", "dma", "tv_homes_count", "pct", "dma_code")
+tv_df$pct <- as.numeric(tv_df$pct)/100
+
+write.csv(tv_df, 'tv-df.csv')
+# manually merged ssd data on racial animus with DMA's in tv-df
+tvnew<-read.csv('tv-df1.csv')
+# drop if animus is NA
+
+gg <- ggplot()
+gg <- gg + geom_map(data=neil_map, map=neil_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="grey", size=0.08, fill=NA)
+gg <- gg + geom_map(data=tvnew, map=neil_map,
+                    aes(fill=animus, map_id=id),
+                    color="grey", size=0.08)
+gg <- gg + scale_fill_viridis(limits = c(25, 155), name = "")
+gg <- gg + theme_map(base_size=12, base_family="Palatino")
+gg <- gg + theme(legend.position="bottom") + ggtitle("Racially Charged Google Search Rate (2004-2007)", subtitle = "Data via Seth Stephens-Davidowitz | Visualization via Alex Albright") + labs(caption="Rates are by DMA (media market) region and acquired from Stephens-Davidowitz (2014).\nGray areas mean no data. Hawaii and Alaska are excluded from the visualization.")
+gg <- gg + theme(legend.key.width=unit(2, "cm")) + theme(plot.title=element_text(size=20, face="bold"))
+gg
+ggsave("animusmap.png", width=12, height=8, dpi=900)
+```
+
+# Plot klavern data
+
+KKK data [here.](https://labs.library.vcu.edu/klan/learn) I fixed some formatting manually in the `klaverns.csv` (some columns were off).
+```{r}
+klaverns<-read.csv('klaverns.csv')
+klaverns$lat<-as.numeric(klaverns$lat)
+klaverns$long<-as.numeric(klaverns$long)
+```
+Plot lat/long on a map... only keep those within map territory.
+```{r}
+# long ranges from -125 to -66, lat ranges from 24.5 to 49.5
+klaverns1 <- subset(klaverns, klaverns$lat >= 24.54424 & klaverns$lat <= 49.38436 & klaverns$long >= -124.733 & klaverns$long <= -66.94932)
+```
+Plot it!
+
+## Plot with dots
+
+```{r, fig.height=3, fig.width=5, warning=FALSE}
+gg1 <- ggplot()
+gg1 <- gg1 + geom_map(data=neil_map, map=neil_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="black", size=0.08, fill=NA)
+gg1 <- gg1 + geom_point(data = klaverns1, aes(x = long, y = lat), color = "red", size = .5) 
+gg1 <- gg1 + theme_map(base_size=12, base_family="Palatino")
+gg1 <- gg1 + ggtitle("Klavern Locations (1915-1940)", subtitle = "Data via VCU Libraries | Visualization via Alex Albright") + labs(caption="Klavern locations are represented by red dots. Location data is from VCU's Mapping the Klan project.\nMap shows DMA (media market) regions. Hawaii and Alaska are excluded from the visualization.")
+gg1 <- gg1 + theme(legend.key.width=unit(2, "cm")) + theme(plot.title=element_text(size=20, face="bold"))
+gg1
+ggsave("klavernmap_a.png", width=12, height=8, dpi=900)
+```
+
+## Plot number of klaverns by DMA 
+
+Used steps from [this tutorial](https://andrewbtran.github.io/NICAR/2017/maps/mapping-census-data.html#points_in_a_polygon)!
+
+```{r, message=FALSE, warning=FALSE}
+# We only need the columns with the latitude and longitude
+coords <- klaverns1[c("long", "lat")]
+
+# Making sure we are working with rows that don't have any blanks
+coords <- coords[complete.cases(coords),]
+
+library(sp)
+# Letting R know that these are specifically spatial coordinates
+sp <- SpatialPoints(coords)
+by_dma <- over(sp, neil)
+
+library(dplyr)
+by_dma <- by_dma %>%
+  group_by(dma) %>%
+  summarise(total=n())
+
+by_dma <- by_dma[!is.na(by_dma$dma),]
+colnames(by_dma) <- c("id", "total")
+
+by_dma<-merge(by_dma, tvnew, all=T)
+# set as 0 if NA
+by_dma$total[is.na(by_dma$total)] <- 0
+```
+Now, plot it!
+```{r, fig.height=4, fig.width=6, warning=FALSE}
+gg3 <- ggplot()
+gg3 <- gg3 + geom_map(data=neil_map, map=neil_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="grey", size=0.08, fill=NA)
+gg3 <- gg3 + geom_map(data=by_dma, map=neil_map,
+                    aes(fill=total, map_id=id),
+                    color="grey", size=0.08)
+gg3 <- gg3 + scale_fill_viridis(limits = c(0, 82), name = "")
+gg3 <- gg3 + theme_map(base_size=12, base_family="Palatino")
+gg3 <- gg3 + theme(legend.position="bottom") + ggtitle("Number of Klaverns (1915-1940)", subtitle = "Data via VCU Libraries | Visualization via Alex Albright") + labs(caption="Color depicts number of Klavern locations per DMA area. Location data is from VCU's Mapping the Klan project.\nMap shows DMA (media market) regions. Hawaii and Alaska are excluded from the visualization.")
+gg3 <- gg3 + theme(legend.key.width=unit(2, "cm")) + theme(plot.title=element_text(size=20, face="bold"))
+gg3
+ggsave("klavernmap_b.png", width=12, height=8, dpi=900)
+```
+Need to figure out population figures... we want to look at klaverns/capita as the metric of interest. (Care about size of the area...bigger places have more klaverns)
+
+## Plot klaverns/million by DMA
+
+Get pop figures for counties and then use county to DMA crosswalk. [Crosswalk should be here.](https://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/22720#) 
+get population county data and aggregate to DMA. Calculate klaverns/million people.
+
+```{r}
+library(foreign); library(stringr)
+dmac<-read.dta('ICPSR_22720_2/DS0003/22720-0003-Data.dta')
+#remove AK cause it's a mess later... basically no counties in DMAs...
+dmac<-subset(dmac, dmac$STATE!="AK")
+
+dmac$county<-str_trim(as.character(dmac$COUNTY))
+dmac$county<-tolower(dmac$county)
+dmac$state<-dmac$STATE
+dmac<-dmac[,c("state", "county", "DMAINDEX")]
+dmac$county<-gsub("\\.","", dmac$county) 
+dmac$county<-gsub("'","", dmac$county) 
+dmac$county<-gsub(" parish","", dmac$county)
+dmac$county<-gsub(" borough","", dmac$county)
+dmac$county<-gsub(" ","", dmac$county)
+```
+Merge this with census 1920 data on counties.
+
+```{r}
+# get 1920 population data
+cdata<-read.csv('countydata.csv')
+cdata<-cdata[,c("STATE","COUNTY","epop1920")]
+cdata$state <- state.abb[match(cdata$STATE, state.name)]
+cdata$county<-tolower(str_trim(cdata$COUNTY))
+cdata$state[cdata$county == "district of columbia"] <- "DC"
+cdata$county[cdata$county == "miami-dade"] <- "dade"
+cdata<-cdata[,c(3:5)]
+cdata$county<-gsub("'","", cdata$county) 
+cdata$county<-gsub(" ","", cdata$county)
+dmac1<-merge(cdata, dmac, by=c("state", "county"), all=F)
+#remove all of alaska
+# exclude dma 67 (lost two counties in it... didnt have pop data)
+dmac1<-subset(dmac1, dmac1$DMAINDEX!=67)
+
+# generate total population by dma
+dmac2<-aggregate(dmac1$epop1920, by=list(dmac1$DMAINDEX), FUN=sum)
+dmac2$pop<-dmac2$x
+dmac2$rank <- dmac2$Group.1
+dmac2<-dmac2[,c(3:4)]
+```
+Bring back in `by_dma`
+```{r}
+#bring back with other data sources
+by_dma<-by_dma[,c("total", "rank", "id", "dma", "animus")]
+by_dma$klaverns<-by_dma$total
+by_dma<-by_dma[,c(2:6)]
+klavern_dma<-merge(by_dma, dmac2, by="rank", all=T)
+klavern_dma$kpml<-log((klavern_dma$klaverns/klavern_dma$pop)*1000000)
+klavern_dma$kpm<-(klavern_dma$klaverns/klavern_dma$pop)*1000000
+klavern_dma$kpml[klavern_dma$klaverns == 0] <- 0
+```
+Plot it! Note: Variation in klaverns/million is so large that if you use the raw rate then visually you can't see the variation... The use of log (as done below) allows the colors to adequately display geographic variation.
+
+```{r, fig.height=4, fig.width=6, warning=FALSE}
+gg4 <- ggplot()
+gg4 <- gg4 + geom_map(data=neil_map, map=neil_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="grey", size=0.08, fill=NA)
+gg4 <- gg4 + geom_map(data=klavern_dma, map=neil_map,
+                    aes(fill=kpml, map_id=id),
+                    color="grey", size=0.08)
+gg4 <- gg4 + scale_fill_viridis(limits = c(0, 8), name = "")
+gg4 <- gg4 + theme_map(base_size=12, base_family="Palatino")
+gg4 <- gg4 + theme(legend.position="bottom") + ggtitle("Log of Klaverns per Million (1915-1940)", subtitle = "Data via VCU Libraries | Visualization via Alex Albright") + labs(caption="Color depicts log of Klaverns per 1 million residents for each DMA area. Location data is from VCU's Mapping the Klan project.\nMap shows DMA (media market) regions. Population data are from 1920 at the county level and aggregated up to the DMA level.\nSet log(Klaverns/Million)=0 if no klaverns. Gray areas mean no data. Hawaii and Alaska are excluded from the visualization.")
+gg4 <- gg4 + theme(legend.key.width=unit(2, "cm")) + theme(plot.title=element_text(size=20, face="bold"))
+gg4
+ggsave("klavernmap_c.png", width=12, height=8, dpi=900)
+```
+
+# Create final graphic 
+Combine two choropleths (the google one and the log(klaverns/million)) into one graphic
+```{r}
+library(grid); library(gridExtra)
+pdf("map_both.pdf", width = 9.5, height = 14)
+grid.arrange(gg4, gg, ncol=1)
+dev.off()
+```
+
+
+# Predicting modern sentiment with historical sentiment
+Let's look at the relationship between the two visually first.
+```{r}
+klavern_dma0 <- klavern_dma[complete.cases(klavern_dma),]
+# 190 observations
+# Plot animus and klaverns per million.
+qplot(klavern_dma0$animus, klavern_dma0$kpm)
+qplot(klavern_dma0$animus, klavern_dma0$kpml)
+```
+The distribution of kpm is badly skewed, making a nonlinear relationship between animus and kpm. Can counter heteroskedasticity via transforming kpm to its log. (See second plot.)
+
+Get LaTeX code for the linear-log regression. (Hey, `stargazer` is great!)
+```{r}
+reg <- lm(animus ~ kpml, data=klavern_dma0)
+library(stargazer)
+star<-stargazer(reg, style="qje", 
+          title            = "Predicting modern animus with past animus",
+          covariate.labels = c("Log(Klaverns/Million)"), notes.append = FALSE, notes.align = "l",
+          dep.var.labels   = "Racially Charged Google Search Rate", omit.stat=c("f", "ser"), notes = "To replace."
+          )
+
+note.latex <- "\\multicolumn{2}{l} {\\parbox[t]{15cm}{ \\textit{Notes:} 190 DMA areas in regression based on data availability.\\Population for counties from 1920 summed up to comprise populations for DMAs.\\ $^{***}$Significant at the 1% level, $^{**}$Significant at the 5% level, $^{*}$Significant at the 10% level.}} \\\\"
+star[grepl("Note",star)] <- note.latex
+cat (star, sep = "\n")
+```
+Sure, coefficient on indepedent variable is statistically significant... but variation in log(klaverns/million) only explains 3-4% of the variation in google search rates. Interpretation: 1% increase in klaverns/million is associated with a 2.645/100=0.02645 unit increase in racially charged google search rate. That is tiny considering that the rates range from 25-155. This is not economically meaningful whatsoever.
+
+Not a meaningful predictor (as V&V got for in paper). Could be for a lot of reasons... 
+
+(1) KKK data not complete. 
+(2) KKK data is locations... not number of members! (Very important.) I suspect number of KKK members in a DMA region is more likely to be a useful predictor of animus visible via google search.
+(3) How do we really interpret google data? Does it make any sense to expect language in searches to reveal historical locations of institutions?
+
+# That's all on this idea. Onto the next one!

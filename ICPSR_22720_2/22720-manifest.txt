@@ -1,0 +1,98 @@
+File Manifest for ICPSR 22720
+
+Gentzkow, Matthew, and Jesse M. Shapiro. Introduction of Television to the
+United States Media Market, 1946-1960. ICPSR22720-v1. Chicago, IL:
+University of Chicago/Ann Arbor, MI: Inter-university Consortium for
+Political and Social Research [distributors], 2008-09-30.
+http://doi.org/10.3886/ICPSR22720.v1
+
+
+Study-level Documentation
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    22720-descriptioncitation.pdf       -       -         -       2014-07-04  -
+
+    22720-related_literature.txt        -       -         -       daily       -
+
+    22720-manifest.txt                  -       -         -       daily       -
+
+
+DS0001 TV Station Diffusion by DMA, 1946-1960
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    22720-0001-Codebook.pdf             -       -         -       2008-09-30  a52a50aedd8d55c596549a6e598eee43
+
+    22720-0001-Data.dta                 -       218       5       2008-09-30  1d311a29ccd6b9457e1cc146a99aebb0
+
+    22720-0001-Data.sav                 -       218       5       2008-09-30  1178893001ef5bef58d1ab2b0fe70b51
+
+    22720-0001-Data.stc                 -       218       5       2008-09-30  84428f0dad473a4df618fca38dfc9a70
+
+    22720-0001-Data.tsv                 -       218       5       2008-09-30  477d7294f118913651cc1bfac6829829
+
+    22720-0001-Data.txt                 101     218       5       2008-09-30  68da8a4f00a94f7839daa61cd22f35b7
+
+    22720-0001-Setup.dct                -       -         -       2008-09-30  657867331fea3a6a4f10dbd4478d603e
+
+    22720-0001-Setup.do                 -       -         -       2008-09-30  4beb3ccefdbdf4bd65e2c1527f4109c7
+
+    22720-0001-Setup.sas                -       -         -       2008-09-30  fe552f36c2c07facde13a1d2a51ab1cb
+
+    22720-0001-Setup.sps                -       -         -       2008-09-30  b9391b5e98a75ce2e34562cedaeb73d0
+
+
+DS0002 TV Set Diffusion by United States County, 1950, 1953-1960
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    22720-0002-Codebook.pdf             -       -         -       2008-09-30  c1e2a7d3574461706d847a187298f10e
+
+    22720-0002-Data.dta                 -       25,091    8       2008-09-30  2b5c8ed284e921e98d5089b66bd1ce06
+
+    22720-0002-Data.sav                 -       25,091    8       2008-09-30  e11e577d847aa004832fc009b41c10b2
+
+    22720-0002-Data.stc                 -       25,091    8       2008-09-30  c3a952e8d1a2c1641fc553bbfb012f24
+
+    22720-0002-Data.tsv                 -       25,091    8       2008-09-30  383a76f53904d0245fa5aa730634f099
+
+    22720-0002-Data.txt                 90      25,091    8       2008-09-30  e76234ef388fb20caa0bc978f81410f8
+
+    22720-0002-Setup.dct                -       -         -       2008-09-30  73faaa14ddf96ff857da9bdb1af66b77
+
+    22720-0002-Setup.do                 -       -         -       2008-09-30  28fa8095b95a26ba81b1a75470b202d3
+
+    22720-0002-Setup.sas                -       -         -       2008-09-30  5899580aa6887156b4b3c02516f41202
+
+    22720-0002-Setup.sps                -       -         -       2008-09-30  d3d93c63397ff2f8df71c537427f1392
+
+
+DS0003 TV Crosswalk -- County to DMA
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    22720-0003-Codebook.pdf             -       -         -       2008-09-30  5216a884fb91bdfa0c5e749f52076c95
+
+    22720-0003-Data.dta                 -       3,119     9       2008-09-30  769838dc50243335ddfb8e4e0baaab7e
+
+    22720-0003-Data.sav                 -       3,119     9       2008-09-30  19df8f11252ca96d7c4333e3bd2f37b5
+
+    22720-0003-Data.stc                 -       3,119     9       2008-09-30  80426b24a01a9408a1cff1823d6a0403
+
+    22720-0003-Data.tsv                 -       3,119     9       2008-09-30  88f4d03855cebfc86ba1f183eee28cec
+
+    22720-0003-Data.txt                 192     3,119     9       2008-09-30  863f8cd6079e8a52ea73a9dcd322a943
+
+    22720-0003-Setup.dct                -       -         -       2008-09-30  83900d5346db79ebb7e287f2f46078b9
+
+    22720-0003-Setup.do                 -       -         -       2008-09-30  edfe585d0aaae7f4b42c613bebe7394e
+
+    22720-0003-Setup.sas                -       -         -       2008-09-30  dc997f1fe2435eb7075111a40668caac
+
+    22720-0003-Setup.sps                -       -         -       2008-09-30  db638578c7bb9f1018407c657e069d8d
+
